@@ -4,6 +4,7 @@
  */
 package controller;
 
+import dao.AdminDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -11,6 +12,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.Admin;
 
 /**
  *
@@ -57,7 +60,18 @@ public class AdminController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        String action = request.getParameter("action");
+
+        if (action != null && action.equals("logout")) {
+            HttpSession session = request.getSession();
+            session.removeAttribute("admin"); // Xóa session admin
+            response.sendRedirect("auth"); // Chuyển về trang đăng nhập
+            return;
+        }
+        request.getRequestDispatcher("login.jsp").forward(request, response);
+        //request.getRequestDispatcher("admin/dashboard.jsp").forward(request, response);
+
     }
 
     /**
@@ -71,7 +85,25 @@ public class AdminController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String user = request.getParameter("username");
+        String pass = request.getParameter("password");
+
+        // Kiểm tra trong DB
+        AdminDAO adminDAO = new AdminDAO();
+        Admin admin = adminDAO.getAdmin(user, pass);
+
+        // Xử lý kết quả
+        if (admin != null) {
+            // Đăng nhập thành công
+            HttpSession session = request.getSession();
+            session.setAttribute("admin", admin);
+            response.sendRedirect("admin"); // Chuyển đến trang dashboard của admin
+        } else {
+            // Đăng nhập thất bại
+            request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng!");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+        }
+
     }
 
     /**
