@@ -4,6 +4,7 @@
  */
 package controller;
 
+import DAO.CustomerDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -11,6 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.Customer;
 
 /**
  *
@@ -71,7 +73,19 @@ public class AuthController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        CustomerDAO cusDAO = new CustomerDAO();
+
+        String email = request.getParameter("email");
+        String pass = request.getParameter("password");
+        Customer c = cusDAO.getCustomer(email, pass);
+        if (c == null) {
+            request.setAttribute("errorMessage", "Email or password is incorrect !");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+
+        } else {
+            response.sendRedirect("home.jsp");
+        }
+
     }
 
     /**
