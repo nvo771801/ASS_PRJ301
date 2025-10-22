@@ -4,6 +4,8 @@
  */
 package controller;
 
+import dao.CategoryDAO;
+import dao.ProductDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -11,6 +13,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import model.Category;
+import model.Product;
 
 /**
  *
@@ -57,7 +62,54 @@ public class ProductController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        ProductDAO productDAO = new ProductDAO();
+        CategoryDAO categoryDAO = new CategoryDAO();
+
+        //Luôn lấy danh sách danh mục để hiển thị sidebar
+        List<Category> listCategories = categoryDAO.getAllCategories();
+        request.setAttribute("categories", listCategories);
+
+        //Lấy hành động (action) từ người dùng
+        String action = request.getParameter("action");
+        List<Product> listProducts;
+
+        if (action != null) {
+            switch (action) {
+                case "filter":
+                    //Xử lý lọc theo category
+                    try {
+                        int cat_id = Integer.parseInt(request.getParameter("cat_id"));
+                        listProducts = productDAO.getProductsByCategoryId(cat_id);
+                        // Đánh dấu category đang active để tô màu trên view
+                        request.setAttribute("active_cat_id", cat_id); 
+                    } catch (NumberFormatException e) {
+                        // Nếu cat_id không hợp lệ, tải tất cả sản phẩm
+                        listProducts = productDAO.getAllProducts();
+                    }
+                    break;
+                case "search":
+                    //Xử lý tìm kiếm
+                    String keyword = request.getParameter("keyword");
+                    listProducts = productDAO.searchProductsByName(keyword);
+                    //Gửi lại keyword về view để hiển thị trong ô search
+                    request.setAttribute("keyword", keyword); 
+                    break;
+                default:
+                    //Mặc định (nếu action không hợp lệ)
+                    listProducts = productDAO.getAllProducts();
+                    break;
+            }
+        } else {
+            //Mặc định (nếu không có action)
+            listProducts = productDAO.getAllProducts();
+        }
+
+        //Gửi danh sách sản phẩm (đã lọc hoặc tìm kiếm) sang view
+        request.setAttribute("products", listProducts);
+
+        //Chuyển tiếp đến trang JSP
+        request.getRequestDispatcher("product.jsp").forward(request, response);
+    
     }
 
     /**
