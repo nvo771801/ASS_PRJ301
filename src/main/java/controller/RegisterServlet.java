@@ -9,19 +9,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import model.Customer;
 
 /**
  *
- * @author Admin
+ * @author Trien
  */
-@WebServlet(name = "AuthController", urlPatterns = {"/auth"})
-public class AuthController extends HttpServlet {
+@WebServlet(name = "RegisterServlet", urlPatterns = {"/register"})
+public class RegisterServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,10 +38,10 @@ public class AuthController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AuthController</title>");
+            out.println("<title>Servlet RegisterServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AuthController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet RegisterServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -61,7 +59,8 @@ public class AuthController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        request.getRequestDispatcher("register.jsp").forward(request, response);
+
     }
 
     /**
@@ -76,58 +75,46 @@ public class AuthController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        CustomerDAO cusDAO = new CustomerDAO();
-
+        CustomerDAO dao = new CustomerDAO();
+        String name = request.getParameter("name");
         String email = request.getParameter("email");
+        String numberPhone = request.getParameter("numberPhone");
         String password = request.getParameter("password");
-        String remember = request.getParameter("remember");
+        String confirmPassword = request.getParameter("confirmPassword");
+        String address = request.getParameter("address");
 
-        Customer c = cusDAO.getCustomer(email, password);
+        Customer checkEmail = dao.checkEmailExists(email);
+        Customer checkPhone = dao.checkPhoneExists(numberPhone);
 
-        if (c == null) {
-            // Xóa cookie nếu login sai
-            Cookie emailCookie = new Cookie("userEmail", "");
-            Cookie passwordCookie = new Cookie("userPassword", "");
-            emailCookie.setMaxAge(0);
-            passwordCookie.setMaxAge(0);
-            emailCookie.setPath("/");
-            passwordCookie.setPath("/");
-            response.addCookie(emailCookie);
-            response.addCookie(passwordCookie);
-
-            request.setAttribute("errorMessage", "Sai email hoặc mật khẩu");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
-
-        } else {
-            // ✅ Tạo session để server biết tài khoản nào đang login
-            HttpSession session = request.getSession();
-            session.setAttribute("customer", c); // lưu toàn bộ object Customer
-            session.setMaxInactiveInterval(30 * 60); // 30 phút
-
-            // Cookie nhớ tài khoản/password
-            if ("on".equals(remember)) {
-                Cookie emailCookie = new Cookie("userEmail", email);
-                Cookie passwordCookie = new Cookie("userPassword", password);
-                emailCookie.setMaxAge(7 * 24 * 60 * 60);
-                passwordCookie.setMaxAge(7 * 24 * 60 * 60);
-                emailCookie.setPath("/");
-                passwordCookie.setPath("/");
-                response.addCookie(emailCookie);
-                response.addCookie(passwordCookie);
-            } else {
-                // Nếu không tick remember, vẫn lưu email nhưng xóa password
-                Cookie emailCookie = new Cookie("userEmail", email);
-                Cookie passwordCookie = new Cookie("userPassword", "");
-                emailCookie.setMaxAge(7 * 24 * 60 * 60);
-                passwordCookie.setMaxAge(0);
-                emailCookie.setPath("/");
-                passwordCookie.setPath("/");
-                response.addCookie(emailCookie);
-                response.addCookie(passwordCookie);
-            }
-
-            response.sendRedirect("home.jsp");
+        if (checkEmail != null) {
+            request.setAttribute("errorDuplicateEmail", "Email này đã tồn tại");
+            request.getRequestDispatcher("register.jsp").forward(request, response);
+            return;
         }
+        
+        if(checkPhone !=null){
+            request.setAttribute("errorDuplicatePhone","Số điện thoại này đã tồn tại");
+            request.getRequestDispatcher("register.jsp").forward(request,response);
+        }
+
+        if (!password.equals(confirmPassword)) {
+            request.setAttribute("errorConfirmPassword", "Mật khẩu xác nhận không đúng");
+            request.getRequestDispatcher("register.jsp").forward(request, response);
+            return;
+        }
+
+        Boolean success = dao.createCustomer(name, email, password, numberPhone, address);
+        
+        if(success == true){
+            response.sendRedirect("login.jsp");
+        }
+        else{
+            request.setAttribute("errorMessage", "Vui lòng nhập lại thông tin đăng ký");
+            request.getRequestDispatcher("register.jsp").forward(request, response);
+        }
+
+       
+
     }
 
     /**
