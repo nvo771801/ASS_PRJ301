@@ -4,12 +4,11 @@
 <!DOCTYPE html>
 <html>
     <head>
-
         <meta charset="UTF-8">
         <title>Login Form</title>
         <link href="bootstrap.min.css" rel="stylesheet" type="text/css"/>
         <style>
-
+            
             .container {
                 display: flex;
                 width: 100%;
@@ -100,104 +99,87 @@
                 margin-top: 15px;
             }
 
+            /* Phần ảnh bên phải */
             .right-panel {
-                width: 50%; 
-                height: 100vh;
+                flex: 1;
+                justify-content: flex-end;
+                width: 50%;
+                margin-right: -290px;
+
                 background-image: url('img/background_login.jpg');
                 background-size: cover;
                 background-position: center;
-                background-repeat: no-repeat;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin: 0; 
-            }
-
-            .overlay-text {
-                width: 100%;
-                height: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
             }
 
             a {
                 text-decoration: none;
-
             }
         </style>
     </head>
     <body>
+      
+        <div class="container">
+            <!-- Cột trái -->
+            <div class="left-panel">
+                <div class="login-form">
+                    <h2>Đăng nhập</h2>
+                    <p>Đăng nhập để truy cập vào website của chúng tôi</p>
 
+                    <form action="auth" method="POST">
+                        <%
+                            String savedEmail = "";
+                            String savedPassword = "";
+                            boolean rememberChecked = false;
 
-        <!-- Cột trái -->
-        <div class="left-panel">
-            <div class="login-form">
-                <h2>Đăng nhập</h2>
-                <p>Đăng nhập để truy cập vào website của chúng tôi</p>
-
-                <form action="auth" method="POST">
-                    <%
-                        String savedEmail = "";
-                        String savedPassword = "";
-                        boolean rememberChecked = false;
-
-                        Cookie[] cookies = request.getCookies();
-                        if (cookies != null) {
-                            for (Cookie c : cookies) {
-                                if ("userEmail".equals(c.getName())) {
-                                    savedEmail = c.getValue();
-                                } else if ("userPassword".equals(c.getName())) {
-                                    savedPassword = c.getValue();
+                            Cookie[] cookies = request.getCookies();
+                            if (cookies != null) {
+                                for (Cookie c : cookies) {
+                                    if ("userEmail".equals(c.getName())) {
+                                        savedEmail = c.getValue();
+                                    } else if ("userPassword".equals(c.getName())) {
+                                        savedPassword = c.getValue();
+                                    }
                                 }
                             }
-                        }
-                        if (savedEmail != null && !savedEmail.isEmpty() && savedPassword != null && !savedPassword.isEmpty()) {
-                            rememberChecked = true;
-                        }
+                            if (savedEmail != null && !savedEmail.isEmpty() && savedPassword != null && !savedPassword.isEmpty()) {
+                                rememberChecked = true;
+                            }
 
-                        if (request.getAttribute("errorMessage") != null) {
-                            savedEmail = "";
-                            savedPassword = "";
-                            rememberChecked = false;
-                        }
-                    %>
+                            if (request.getAttribute("errorMessage") != null) {
+                                savedEmail = "";
+                                savedPassword = "";
+                                rememberChecked = false;
+                            }
+                        %>
 
-                    <input type="email" class="form-control" name="email" placeholder="Email" value="<%= savedEmail%>" required>
-                    <input type="password" class="form-control" name="password" placeholder="Password" value="<%= savedPassword%>" required>
+                        <input type="email" class="form-control" name="email" placeholder="Email" value="<%= savedEmail%>" required>
+                        <input type="password" class="form-control" name="password" placeholder="Password" value="<%= savedPassword%>" required>
 
-                    <div class="remember-section">
-                        <div>
-                            <input type="checkbox" id="remember" name="remember" <%= rememberChecked ? "checked" : ""%>>
-                            <label for="remember">Ghi nhớ tài khoản</label>
+                        <div class="remember-section">
+                            <div>
+                                <input type="checkbox" id="remember" name="remember" <%= rememberChecked ? "checked" : ""%>>
+                                <label for="remember">Ghi nhớ tài khoản</label>
+                            </div>
+                            <a href="#" style="color:#d00000;">Quên mật khẩu</a>
                         </div>
-                        <a href="#" style="color:#d00000;">Quên mật khẩu</a>
-                    </div>
 
-                    <button type="submit" class="btn-login">Log In</button>
+                        <button type="submit" class="btn-login">Đăng nhập</button>
 
-                    <div class="text-center mt-3">
-                        <span>Bạn chưa có tài khoản? </span>
-                        <a href="register" style="color:#d00000; font-weight:600;">Đăng ký</a>
-                    </div>
-                </form>
+                        <div class="text-center mt-3">
+                            <span>Bạn chưa có tài khoản? </span>
+                            <a href="register" style="color:#d00000; font-weight:600;">Đăng ký</a>
+                        </div>
+                    </form>
 
-                <c:if test="${not empty errorMessage}">
-                    <small class="alert alert-danger" role="alert">${errorMessage}</small>
-                </c:if>
+                    <c:if test="${not empty errorMessage}">
+                        <p class="alert alert-danger" role="alert">${errorMessage}</p>
+                    </c:if>
+                </div>
             </div>
 
+            <!-- Cột phải -->
+            <div class="right-panel"></div>
         </div>
-
-        <!-- Cột phải -->
-        <!-- Cột phải -->
-        <div class="right-panel">
-            <div class="overlay-text">
-                <h1></h1>
-            </div>
-        </div>
-
-
 
     </body>
 </html>
