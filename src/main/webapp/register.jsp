@@ -96,6 +96,13 @@
             a:hover {
                 color: #a30000;
             }
+            
+            .errorMessage{
+                color:red;
+                display:block;
+                font-size:14px;
+                margin-top:2px;
+            }
         </style>
     </head>
     <body>
@@ -114,13 +121,13 @@
                         <!-- Email -->
                         <input type="email" class="form-control" name="email" placeholder="Địa chỉ Email" required>
                         <c:if test="${not empty errorDuplicateEmail}">
-                            <small class="alert alert-danger">${errorDuplicateEmail}</small>
+                           <small class="errorMessage">${errorDuplicateEmail}</small
                         </c:if>
 
                         <!-- Phone -->
-                        <input type="tel" class="form-control" name="numberPhone" pattern="0[0-9]{10,11}" placeholder="Số điện thoại (10-11 số)" required>
+                        <input type="tel" class="form-control" name="numberPhone" pattern="0[0-9]{9,10}" placeholder="Số điện thoại (9-10 số)" required>
                         <c:if test="${not empty errorDuplicatePhone}">
-                            <small class="alert alert-danger">${errorDuplicatePhone}</small>
+                            <small class="errorMessage">${errorDuplicatePhone}</small
                         </c:if>
 
                         <!-- Password -->
@@ -129,7 +136,7 @@
                         <!-- Confirm Password -->
                         <input type="password" class="form-control" name="confirmPassword" placeholder="Xác nhận mật khẩu" required>
                         <c:if test="${not empty errorConfirmPassword}">
-                            <small class="alert alert-danger">${errorConfirmPassword}</small>
+                            <small class="errorMessage">${errorConfirmPassword}</small>
                         </c:if>
 
                         <!-- Address -->

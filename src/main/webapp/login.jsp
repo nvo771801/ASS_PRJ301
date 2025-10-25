@@ -9,7 +9,7 @@
         <title>Login Form</title>
         <link href="bootstrap.min.css" rel="stylesheet" type="text/css"/>
         <style>
-            
+
             .container {
                 display: flex;
                 width: 100%;
@@ -100,137 +100,104 @@
                 margin-top: 15px;
             }
 
-            /* Phần ảnh bên phải */
             .right-panel {
-                flex: 1;
-                justify-content: flex-end;
-                width: 50%;
-                margin-right: -290px;
-
+                width: 50%; 
+                height: 100vh;
                 background-image: url('img/background_login.jpg');
                 background-size: cover;
                 background-position: center;
+                background-repeat: no-repeat;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0; 
+            }
+
+            .overlay-text {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             a {
                 text-decoration: none;
->>>>>>> feature-login
+
             }
         </style>
     </head>
     <body>
-      
-        <div class="container">
-<<<<<<< HEAD
-            <div class="login-form">
-                
-                <h2 class="text-center mb-4">${empty loginTitle ? 'Login' : loginTitle}</h2>
-                
-                <form action="${empty loginTarget ? 'auth' : loginTarget}" method="POST">
-                    
-                    <c:choose>
-                        <c:when test="${loginTarget == 'admin'}">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" required>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+
+        <!-- Cột trái -->
+        <div class="left-panel">
+            <div class="login-form">
+                <h2>Đăng nhập</h2>
+                <p>Đăng nhập để truy cập vào website của chúng tôi</p>
+
+                <form action="auth" method="POST">
+                    <%
+                        String savedEmail = "";
+                        String savedPassword = "";
+                        boolean rememberChecked = false;
+
+                        Cookie[] cookies = request.getCookies();
+                        if (cookies != null) {
+                            for (Cookie c : cookies) {
+                                if ("userEmail".equals(c.getName())) {
+                                    savedEmail = c.getValue();
+                                } else if ("userPassword".equals(c.getName())) {
+                                    savedPassword = c.getValue();
+                                }
+                            }
+                        }
+                        if (savedEmail != null && !savedEmail.isEmpty() && savedPassword != null && !savedPassword.isEmpty()) {
+                            rememberChecked = true;
+                        }
+
+                        if (request.getAttribute("errorMessage") != null) {
+                            savedEmail = "";
+                            savedPassword = "";
+                            rememberChecked = false;
+                        }
+                    %>
+
+                    <input type="email" class="form-control" name="email" placeholder="Email" value="<%= savedEmail%>" required>
+                    <input type="password" class="form-control" name="password" placeholder="Password" value="<%= savedPassword%>" required>
+
+                    <div class="remember-section">
+                        <div>
+                            <input type="checkbox" id="remember" name="remember" <%= rememberChecked ? "checked" : ""%>>
+                            <label for="remember">Ghi nhớ tài khoản</label>
+                        </div>
+                        <a href="#" style="color:#d00000;">Quên mật khẩu</a>
                     </div>
-                    
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Login</button>
+
+                    <button type="submit" class="btn-login">Log In</button>
+
+                    <div class="text-center mt-3">
+                        <span>Bạn chưa có tài khoản? </span>
+                        <a href="register" style="color:#d00000; font-weight:600;">Đăng ký</a>
                     </div>
                 </form>
 
-                <c:if test="${not empty error}">
-                    <p style="color:red;" class="mt-3">${error}</p>
-                </c:if>
                 <c:if test="${not empty errorMessage}">
-                    <p style="color:red;" class="mt-3">${errorMessage}</p>
+                    <small class="alert alert-danger" role="alert">${errorMessage}</small>
                 </c:if>
-
-                <c:if test="${loginTarget != 'admin'}">
-                    <p class="text-center mt-3">
-                        Chưa có tài khoản? <a href="auth?action=register">Đăng ký ngay</a>
-                    </p>
-                    <p class="text-center mt-2">
-                        <a href="home">Quay về trang chủ</a>
-                    </p>
-                </c:if>
-=======
-            <!-- Cột trái -->
-            <div class="left-panel">
-                <div class="login-form">
-                    <h2>Đăng nhập</h2>
-                    <p>Đăng nhập để truy cập vào website của chúng tôi</p>
-
-                    <form action="auth" method="POST">
-                        <%
-                            String savedEmail = "";
-                            String savedPassword = "";
-                            boolean rememberChecked = false;
-
-                            Cookie[] cookies = request.getCookies();
-                            if (cookies != null) {
-                                for (Cookie c : cookies) {
-                                    if ("userEmail".equals(c.getName())) {
-                                        savedEmail = c.getValue();
-                                    } else if ("userPassword".equals(c.getName())) {
-                                        savedPassword = c.getValue();
-                                    }
-                                }
-                            }
-                            if (savedEmail != null && !savedEmail.isEmpty() && savedPassword != null && !savedPassword.isEmpty()) {
-                                rememberChecked = true;
-                            }
-
-                            if (request.getAttribute("errorMessage") != null) {
-                                savedEmail = "";
-                                savedPassword = "";
-                                rememberChecked = false;
-                            }
-                        %>
-
-                        <input type="email" class="form-control" name="email" placeholder="Email" value="<%= savedEmail%>" required>
-                        <input type="password" class="form-control" name="password" placeholder="Password" value="<%= savedPassword%>" required>
-
-                        <div class="remember-section">
-                            <div>
-                                <input type="checkbox" id="remember" name="remember" <%= rememberChecked ? "checked" : ""%>>
-                                <label for="remember">Remember me</label>
-                            </div>
-                            <a href="#" style="color:#d00000;">Forgot Password</a>
-                        </div>
-
-                        <button type="submit" class="btn-login">Log In</button>
-
-                        <div class="text-center mt-3">
-                            <span>Bạn chưa có tài khoản? </span>
-                            <a href="register" style="color:#d00000; font-weight:600;">Đăng ký</a>
-                        </div>
-                    </form>
-
-                    <c:if test="${not empty errorMessage}">
-                        <p class="alert alert-danger" role="alert">${errorMessage}</p>
-                    </c:if>
-                </div>
->>>>>>> feature-login
             </div>
 
-            <!-- Cột phải -->
-            <div class="right-panel"></div>
         </div>
+
+        <!-- Cột phải -->
+        <!-- Cột phải -->
+        <div class="right-panel">
+            <div class="overlay-text">
+                <h1></h1>
+            </div>
+        </div>
+
+
 
     </body>
 </html>
