@@ -65,25 +65,77 @@ public class CustomerDAO extends DBContext {
         }
         return null;
     }
+    
+    
+    
+    public Customer checkPhoneExists(String numberPhone){
+        String sql ="Select * from customer WHERE phone = ?";
+        
+        try{
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1,numberPhone);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                return new Customer(
+                rs.getInt("cus_id"),
+                rs.getString("full_name"),
+                rs.getString("email"),
+                rs.getString("password"),
+                rs.getString("phone"),
+                rs.getString("address"));
+            }
+            
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
 
     /**
      * Tạo một tài khoản khách hàng mới (đăng ký).
      *
      * @param customer Đối tượng Customer chứa thông tin đăng ký.
      */
-    public void createCustomer(Customer customer) {
-        String sql = "INSERT INTO Customer (full_name, email, password, phone, address) VALUES (?, ?, ?, ?, ?)";
-        try {
+//    public void createCustomer(String fullName, String email, String password, String phone, String address) {
+//        String sql = "INSERT INTO Customer (full_name, email, password, phone, address) \n"
+//                + "VALUES (N'?', '?', ?, ?,N'?')";
+//        try {
+//            PreparedStatement ps = conn.prepareStatement(sql);
+//            ps.setString(1, customer.getFullname());
+//            ps.setString(2, customer.getEmail());
+//            ps.setString(3, customer.getPass()); // Dùng getPass() từ model
+//            ps.setString(4, customer.getPhone());
+//            ps.setString(5, customer.getAddress());
+//            ps.executeUpdate();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+    public Boolean createCustomer(String name, String email, String password, String numberPhone, String address) {
+        String sql = "INSERT INTO Customer (full_name, email, password, phone, address) \n"
+                + "VALUES (?, ?, ?, ?,?)";
+        try{
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, customer.getFullname());
-            ps.setString(2, customer.getEmail());
-            ps.setString(3, customer.getPass()); // Dùng getPass() từ model
-            ps.setString(4, customer.getPhone());
-            ps.setString(5, customer.getAddress());
-            ps.executeUpdate();
-        } catch (Exception e) {
+            ps.setString(1,name);
+            ps.setString(2, email);
+            ps.setString(3,password);
+            ps.setString(4, numberPhone);
+            ps.setString(5, address);
+            int rs = ps.executeUpdate();
+            return rs>0;
+            
+        }catch(Exception e){
             e.printStackTrace();
         }
+
+        return false;
+    }
+    public static void main(String[] args) {
+        CustomerDAO dao = new CustomerDAO();
+        Customer test = dao.checkPhoneExists("12345678");
+        System.out.println(test);
+        
     }
 
     /**
@@ -139,4 +191,6 @@ public class CustomerDAO extends DBContext {
             e.printStackTrace();
         }
     }
+    
+    
 }
