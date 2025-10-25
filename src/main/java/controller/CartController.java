@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Admin
  */
 @WebServlet(name = "CartController", urlPatterns = {"/cart"})
-public class CartController extends HttpServlet {
+public class CartController extends DBContext {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -57,8 +57,58 @@ public class CartController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+    String action = request.getParameter("action");
+        if (action == null) action = "view";
+
+        HttpSession session = request.getSession();
+        Cart cart = (Cart) session.getAttribute("cart");
+        if (cart == null) {
+            cart = new Cart();
+            session.setAttribute("cart", cart);
+        }
+
+        ProductDAO productDAO = new ProductDAO();
+
+        switch (action) {
+            case "add":
+                try {
+                    int productId = Integer.parseInt(request.getParameter("productId"));
+                    Product p = productDAO.getProductById(productId);
+                    if (p != null) {
+                        cart.addItem(p);
+                        session.setAttribute("cart", cart);
+                    }
+                } catch (NumberFormatException ignored) {}
+                response.sendRedirect(request.getContextPath() + "/cart?action=view");
+                break;
+
+            case "update":
+                try {
+                    int productId = Integer.parseInt(request.getParameter("productId"));
+                    int qty = Integer.parseInt(request.getParameter("quantity"));
+                    cart.updateItem(productId, qty);
+                    session.setAttribute("cart", cart);
+                } catch (NumberFormatException ignored) {}
+                response.sendRedirect(request.getContextPath() + "/cart?action=view");
+                break;
+
+            case "remove":
+                try {
+                    int productId = Integer.parseInt(request.getParameter("productId"));
+                    cart.removeItem(productId);
+                    session.setAttribute("cart", cart);
+                } catch (NumberFormatException ignored) {}
+                response.sendRedirect(request.getContextPath() + "/cart?action=view");
+                break;
+
+            case "view":
+            default:
+                // Forward to JSP to view cart
+                request.getRequestDispatcher("/cart.jsp").forward(request, response);
+                break;
+        }
     }
+    
 
     /**
      * Handles the HTTP <code>POST</code> method.
