@@ -158,12 +158,12 @@
                         <div class="remember-section">
                             <div>
                                 <input type="checkbox" id="remember" name="remember" <%= rememberChecked ? "checked" : ""%>>
-                                <label for="remember">Remember me</label>
+                                <label for="remember">Ghi nhớ tài khoản</label>
                             </div>
-                            <a href="#" style="color:#d00000;">Forgot Password</a>
+                            <a href="#" style="color:#d00000;">Quên mật khẩu</a>
                         </div>
 
-                        <button type="submit" class="btn-login">Log In</button>
+                        <button type="submit" class="btn-login">Đăng nhập</button>
 
                         <div class="text-center mt-3">
                             <span>Bạn chưa có tài khoản? </span>
